@@ -18,7 +18,11 @@ export const TodoModal: React.FC<TodoModalProps> = ({
 }) => {
   return (
     <div className="modal is-active" data-cy="modal">
-      <div className="modal-background" onClick={onClose} />
+      <div
+        className="modal-background"
+        onClick={onClose}
+        aria-label="Close modal background"
+      />
 
       {loadingUser ? (
         <Loader />
@@ -32,12 +36,12 @@ export const TodoModal: React.FC<TodoModalProps> = ({
               Todo #{todo.id}
             </div>
 
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <button
               type="button"
               className="delete"
               data-cy="modal-close"
               onClick={onClose}
+              aria-label="Close modal"
             />
           </header>
 
@@ -47,18 +51,23 @@ export const TodoModal: React.FC<TodoModalProps> = ({
             </p>
 
             <p className="block" data-cy="modal-user">
-              {/* <strong className="has-text-success">Done</strong> */}
               {todo.completed ? (
                 <strong className="has-text-success">Done</strong>
               ) : (
                 <strong className="has-text-danger">Planned</strong>
               )}
 
-              {user && (
+              {user ? (
                 <>
                   {' by '}
-                  <a href={`mailto:${user.email}`}>{user.name}</a>
+                  {user.email && user.name ? (
+                    <a href={`mailto:${user.email}`}>{user.name}</a>
+                  ) : (
+                    <span>Unknown user</span>
+                  )}
                 </>
+              ) : (
+                ' by Unknown user'
               )}
             </p>
           </div>

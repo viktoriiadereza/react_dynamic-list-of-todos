@@ -27,7 +27,7 @@ export const TodoList: React.FC<TodoListProps> = ({
         </tr>
       </thead>
       <tbody>
-        {todos.map((todo) => (
+        {todos.map(todo => (
           <tr key={todo.id} data-cy="todo">
             <td className="is-vcentered">{todo.id}</td>
             <td className="is-vcentered">
@@ -52,6 +52,12 @@ export const TodoList: React.FC<TodoListProps> = ({
                 className="button"
                 type="button"
                 onClick={() => onTodoClick(todo)}
+                aria-label={`${
+                  selectedTodo?.id === todo.id ? 'Deselect' : 'Select'
+                } todo with ID ${todo.id}`}
+                title={`${
+                  selectedTodo?.id === todo.id ? 'Deselect' : 'Select'
+                } this todo`}
               >
                 <span className="icon">
                   <i

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface FilterParams {
   query: string;
@@ -13,9 +13,13 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({ onFilterChange }) => {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
 
-  useEffect(() => {
+  const handleFilterChange = useCallback(() => {
     onFilterChange({ query, status });
   }, [query, status, onFilterChange]);
+
+  useEffect(() => {
+    handleFilterChange();
+  }, [handleFilterChange]);
 
   return (
     <form className="field has-addons">
@@ -24,9 +28,7 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({ onFilterChange }) => {
           <select
             data-cy="statusSelect"
             value={status}
-            onChange={e => {
-              setStatus(e.target.value);
-            }}
+            onChange={e => setStatus(e.target.value)}
           >
             <option value="all">All</option>
             <option value="active">Active</option>
@@ -48,11 +50,11 @@ export const TodoFilter: React.FC<TodoFilterProps> = ({ onFilterChange }) => {
         </span>
         {query && (
           <span className="icon is-right" style={{ pointerEvents: 'all' }}>
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <button
               data-cy="clearSearchButton"
               type="button"
               className="delete"
+              aria-label="Clear search input"
               onClick={() => setQuery('')}
             />
           </span>

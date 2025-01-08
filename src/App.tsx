@@ -14,29 +14,33 @@ import { User } from './types/User';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [filteredTodos, setFilteredTodosState] = useState<Todo[]>([]);
+  const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingUser, setLoadingUser] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
+  const [error, setError] = useState<string | null>(null); // Для обробки помилок
 
+  // Завантаження списку todos
   useEffect(() => {
     setLoading(true);
+    setError(null); // Очистити попередню помилку
     getTodos()
       .then(fetchedTodos => {
         setTodos(fetchedTodos);
-        setFilteredTodosState(fetchedTodos);
+        setFilteredTodos(fetchedTodos);
       })
       .catch(() => {
-        // Обробка помилок
+        setError('Failed to load todos. Please try again later.');
       })
       .finally(() => {
         setLoading(false);
       });
   }, []);
 
+  // Фільтрація списку todos
   useEffect(() => {
     const newFilteredTodos = todos.filter(todo => {
       const matchesQuery = todo.title
@@ -50,29 +54,33 @@ export const App: React.FC = () => {
       return matchesQuery && matchesStatus;
     });
 
-    setFilteredTodosState(newFilteredTodos);
+    setFilteredTodos(newFilteredTodos);
   }, [query, status, todos]);
 
+  // Відкриття модального вікна з інформацією про todo
   const handleShowModal = (todo: Todo) => {
     setSelectedTodo(todo);
     setLoadingUser(true);
+    setError(null); // Очистити попередню помилку
     getUser(todo.userId)
       .then(fetchedUser => {
         setUser(fetchedUser);
       })
       .catch(() => {
-        // Обробка помилок
+        setError('Failed to load user information. Please try again later.');
       })
       .finally(() => {
         setLoadingUser(false);
       });
   };
 
+  // Закриття модального вікна
   const handleCloseModal = () => {
     setSelectedTodo(null);
     setUser(null);
   };
 
+  // Оновлення фільтра
   const handleFilterChange = ({
     query: newQuery,
     status: newStatus,
@@ -90,6 +98,14 @@ export const App: React.FC = () => {
         <div className="container">
           <div className="box">
             <h1 className="title">Todos:</h1>
+
+            {/* Відображення помилок */}
+            {error && (
+              <div className="notification is-danger">
+                <button className="delete" onClick={() => setError(null)} />
+                {error}
+              </div>
+            )}
 
             <div className="block">
               <TodoFilter onFilterChange={handleFilterChange} />
